@@ -1,0 +1,7 @@
+<?php
+require_once __DIR__.'/../config/bootstrap.php';require_admin();
+$rows=$pdo->query("SELECT u.id,u.nama,u.email,u.no_hp,u.created_at,(SELECT COUNT(*) FROM voting v WHERE v.user_id=u.id) AS total_vote,(SELECT p.status FROM payments p WHERE p.user_id=u.id ORDER BY p.id DESC LIMIT 1) AS payment_status FROM users u WHERE u.role='pemilih' ORDER BY u.created_at DESC")->fetchAll();
+$page_title='Data Pemilih';require __DIR__.'/../includes/header.php';
+?>
+<header class="page-head"><div class="container"><span class="eyebrow">Administrator</span><h1 class="mt-2">Data Pemilih</h1><p>Daftar akun pemilih dan ringkasan aktivitas voting.</p></div></header><section class="section-pad"><div class="container"><div class="panel-card table-responsive"><table class="table table-hover mb-0"><thead><tr><th>Nama</th><th>Email</th><th>No. HP</th><th>Voting</th><th>Pembayaran</th><th>Terdaftar</th></tr></thead><tbody><?php foreach($rows as $r):?><tr><td class="fw-bold"><?=e($r['nama'])?></td><td><?=e($r['email'])?></td><td><?=e($r['no_hp'])?></td><td><?=$r['total_vote']?> suara</td><td><?=e(strtoupper($r['payment_status']??'BELUM'))?></td><td><?=date('d M Y',strtotime($r['created_at']))?></td></tr><?php endforeach;?><?php if(!$rows):?><tr><td colspan="6" class="text-center text-muted py-4">Belum ada akun pemilih.</td></tr><?php endif;?></tbody></table></div></div></section>
+<?php require __DIR__.'/../includes/footer.php';?>
